@@ -340,39 +340,47 @@ describe('Data Rendering - Column Rendering', () => {
 		]);
 	});
 
-	test('quick add moves the created file to the configured folder', async () => {
+	test('quick add creates file directly in the configured folder', async () => {
 		const entries = createEntriesWithStatus();
-		const createdFile = createMockTFile('dashboards/New Task.md');
-		let markdownFiles = [createMockTFile('dashboards/maintenance-board.base')];
 
 		controller = createMockQueryController(entries, TEST_PROPERTIES);
 		controller.app = app;
 		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
 		controller.config.set('quickAddFolder', 'energy');
 
-		(app.vault as any).getMarkdownFiles = () => markdownFiles;
 		(app.vault as any).getFolderByPath = (path: string) => (path === 'energy' ? { path, name: 'energy' } : null);
-		(app.vault as any).getAbstractFileByPath = (path: string) => markdownFiles.find((file) => file.path === path) ?? null;
 
 		const view = new KanbanView(controller, scrollEl);
 		setupKanbanViewWithApp(view, app);
 		triggerDataUpdate(view);
-		(view as any).createFileForView = async (
-			baseFileName: string,
-			frontmatterProcessor?: (frontmatter: Record<string, unknown>) => void,
-		) => {
-			const frontmatter: Record<string, unknown> = {};
-			frontmatterProcessor?.(frontmatter);
-			(view as any).createFileForViewCalls.push({ baseFileName, frontmatter });
-			markdownFiles = [...markdownFiles, createdFile];
-		};
 
 		await (view as any).createQuickAddCard('New Task', 'Doing', null);
 
 		assert.deepStrictEqual((view as any).createFileForViewCalls, [
-			{ baseFileName: 'New Task', frontmatter: { status: 'Doing' } },
+			{ baseFileName: 'energy/New Task', frontmatter: { status: 'Doing' } },
 		]);
-		assert.deepStrictEqual(app.fileManager.renameFile.calls[0], [createdFile, 'energy/New Task.md']);
+		assert.deepStrictEqual(app.fileManager.renameFile.calls, []);
+	});
+
+	test('quick add creates file in active file folder when no folder is configured', async () => {
+		const entries = createEntriesWithStatus();
+
+		controller = createMockQueryController(entries, TEST_PROPERTIES);
+		controller.app = app;
+		controller.config.getAsPropertyId = () => PROPERTY_STATUS;
+
+		(app.workspace as any).getActiveFile = () =>
+			createMockTFile('projects/work.base', 'work', { path: 'projects', name: 'projects' });
+
+		const view = new KanbanView(controller, scrollEl);
+		setupKanbanViewWithApp(view, app);
+		triggerDataUpdate(view);
+
+		await (view as any).createQuickAddCard('New Task', 'Doing', null);
+
+		assert.deepStrictEqual((view as any).createFileForViewCalls, [
+			{ baseFileName: 'projects/New Task', frontmatter: { status: 'Doing' } },
+		]);
 	});
 
 	test('quick add closes the native Base new item popover', async () => {
