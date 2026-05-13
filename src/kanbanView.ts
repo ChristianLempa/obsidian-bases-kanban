@@ -1637,7 +1637,7 @@ export class KanbanView extends BasesView {
 			return;
 		}
 
-		const oldColumnValue = oldColumnEl.instanceOf(HTMLElement)
+		const oldColumnValue = oldColumnEl?.instanceOf(HTMLElement)
 			? oldColumnEl.getAttribute(DATA_ATTRIBUTES.COLUMN_VALUE)
 			: null;
 		const newColumnValue = newColumnEl.getAttribute(DATA_ATTRIBUTES.COLUMN_VALUE);
@@ -1656,8 +1656,8 @@ export class KanbanView extends BasesView {
 		const swimlaneSelector = `.${CSS_CLASSES.SWIMLANE}`;
 		const oldLaneEl = evt.from.closest(swimlaneSelector);
 		const newLaneEl = evt.to.closest(swimlaneSelector);
-		const swimlaneActive = newLaneEl.instanceOf(HTMLElement);
-		const oldLaneValue = oldLaneEl.instanceOf(HTMLElement)
+		const swimlaneActive = newLaneEl?.instanceOf(HTMLElement) ?? false;
+		const oldLaneValue = oldLaneEl?.instanceOf(HTMLElement)
 			? oldLaneEl.getAttribute(DATA_ATTRIBUTES.SWIMLANE_VALUE)
 			: null;
 		const newLaneValue = swimlaneActive ? newLaneEl.getAttribute(DATA_ATTRIBUTES.SWIMLANE_VALUE) : null;
@@ -1688,7 +1688,7 @@ export class KanbanView extends BasesView {
 
 		// Cross-cell drop: capture DOM order for both source and destination
 		if (!sortActive) {
-			if (oldColumnEl.instanceOf(HTMLElement) && oldColumnValue) {
+			if (oldColumnEl?.instanceOf(HTMLElement) && oldColumnValue) {
 				const oldBody = oldColumnEl.querySelector(`.${CSS_CLASSES.COLUMN_BODY}`);
 				if (oldBody) this._prefs.cardOrders[oldKey] = getColumnPaths(oldBody);
 			}
