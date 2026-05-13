@@ -576,6 +576,7 @@ export class KanbanView extends BasesView {
 		hasSwimlanes: boolean,
 	): void {
 		this.containerEl.empty();
+		this.containerEl.classList.toggle(CSS_CLASSES.VIEW_CONTAINER_WITH_SWIMLANES, hasSwimlanes);
 		this.destroySortables();
 		const boardEl = this.containerEl.createDiv({
 			cls: hasSwimlanes ? `${CSS_CLASSES.BOARD} ${CSS_CLASSES.BOARD_WITH_SWIMLANES}` : CSS_CLASSES.BOARD,
