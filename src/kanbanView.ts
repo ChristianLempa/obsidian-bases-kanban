@@ -842,7 +842,7 @@ export class KanbanView extends BasesView {
 		// Defer scroll restoration to the next frame so layout has finalized.
 		// Synchronous scrollTop assignment can be clamped when a transient layout
 		// pass reports a smaller scrollHeight (e.g. image-backed cards not yet laid out).
-		requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
 			try {
 				boardEl.querySelectorAll<HTMLElement>(`.${CSS_CLASSES.COLUMN_BODY}`).forEach((body) => {
 					const colEl = body.closest<HTMLElement>(`.${CSS_CLASSES.COLUMN}`);
@@ -1497,9 +1497,9 @@ export class KanbanView extends BasesView {
 		};
 
 		closePopovers();
-		activeWindow.requestAnimationFrame(closePopovers);
+		window.requestAnimationFrame(closePopovers);
 		for (const delay of [50, 250, 1000]) {
-			activeWindow.setTimeout(closePopovers, delay);
+			window.setTimeout(closePopovers, delay);
 		}
 	}
 
@@ -1786,9 +1786,9 @@ export class KanbanView extends BasesView {
 		let frames = 4;
 		const tick = () => {
 			restore();
-			if (--frames > 0) requestAnimationFrame(tick);
+			if (--frames > 0) window.requestAnimationFrame(tick);
 		};
-		requestAnimationFrame(tick);
+		window.requestAnimationFrame(tick);
 	}
 
 	private setActiveCard(path: string | null): void {

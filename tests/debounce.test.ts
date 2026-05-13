@@ -3,6 +3,7 @@ import assert from 'node:assert';
 import { debounce } from '../src/utils/debounce.ts';
 
 (globalThis as any).activeWindow = globalThis;
+(globalThis as any).window = globalThis;
 
 describe('debounce', () => {
 	beforeEach(() => {
