@@ -1,15 +1,13 @@
 import type { App, BasesEntry, BasesPropertyId, Component, HoverPopover, QueryController, ViewOption } from 'obsidian';
 import {
 	BasesView,
-	HTMLValue,
 	Keymap,
 	ListValue,
-	MarkdownRenderer,
 	NullValue,
 	Notice,
+	Value,
 	normalizePath,
 	parsePropertyId,
-	sanitizeHTMLToDom,
 	setIcon,
 } from 'obsidian';
 import type { TFile } from 'obsidian';
@@ -73,59 +71,38 @@ export function isCollapsedLanes(value: unknown): value is Record<string, string
 }
 
 /**
- * Wraps MarkdownRenderer.render() and strips the outer <p> it emits for
- * inline content, matching the pattern used by Dataview (blacksmithgu/obsidian-dataview,
- * src/ui/render.ts — renderCompactMarkdown).
- */
-async function renderCompactMarkdown(
-	app: App,
-	markdown: string,
-	el: HTMLElement,
-	sourcePath: string,
-	component: Component,
-): Promise<void> {
-	const span = el.createSpan();
-	await MarkdownRenderer.render(app, markdown, span, sourcePath, component);
-	const p = span.querySelector(':scope > p');
-	if (span.children.length === 1 && p) {
-		while (p.firstChild) span.appendChild(p.firstChild);
-		span.removeChild(p);
-	}
-}
-
-/**
- * Render an Obsidian Value into a container element with type-aware dispatch.
+ * Render an Obsidian Value into a container element.
  *
- * Dispatch order (most-specific subclass first to avoid StringValue catching
- * HTMLValue/LinkValue before they are checked):
- *   HTMLValue  → sanitizeHTMLToDom (raw HTML from the html("") formula function)
- *   ListValue  → comma-separated spans, each item rendered recursively
- *   everything else → MarkdownRenderer.render via renderCompactMarkdown
- *                     (handles wikilinks, tags, plain text, dates, booleans …)
+ * ListValue is walked manually so the comma separator and NullValue-skipping
+ * rules are kanban-owned, and so each item dispatches recursively (a LinkValue
+ * inside a list still routes through Value.renderTo).
  *
- * Value class sources: https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts (@since 1.10.0)
- * Dataview dispatch reference: https://github.com/blacksmithgu/obsidian-dataview/blob/master/src/ui/render.ts
+ * Every other Value subclass — StringValue, NumberValue, BooleanValue,
+ * DateValue, RelativeDateValue, DurationValue, FileValue, HTMLValue,
+ * IconValue, ImageValue, LinkValue, ObjectValue, RegExpValue, TagValue,
+ * UrlValue — funnels through Value.renderTo. This is the same renderer the
+ * native Bases Table view uses, so values translate neatly between views.
+ *
+ * Value / renderTo API: https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts (@since 1.10.0)
  */
 export async function renderPropertyValue(
 	app: App | undefined,
-	value: { toString(): string },
+	value: Value,
 	el: HTMLElement,
-	sourcePath: string,
-	component: Component,
+	_sourcePath: string,
+	_component: Component,
 ): Promise<void> {
-	if (value instanceof HTMLValue) {
-		el.appendChild(sanitizeHTMLToDom(value.toString()));
-	} else if (value instanceof ListValue) {
+	if (value instanceof ListValue) {
 		const len = value.length();
 		for (let i = 0; i < len; i++) {
 			if (i > 0) el.appendChild(el.doc.createTextNode(', '));
 			const item = value.get(i);
 			if (!(item instanceof NullValue)) {
-				await renderPropertyValue(app, item, el, sourcePath, component);
+				await renderPropertyValue(app, item, el, _sourcePath, _component);
 			}
 		}
 	} else if (app) {
-		await renderCompactMarkdown(app, value.toString(), el, sourcePath, component);
+		value.renderTo(el, app.renderContext);
 	} else {
 		el.appendChild(el.doc.createTextNode(value.toString()));
 	}

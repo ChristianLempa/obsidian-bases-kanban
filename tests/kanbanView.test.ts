@@ -31,6 +31,8 @@ import {
 	VALUE_DATE,
 	VALUE_HTML,
 	VALUE_LINK,
+	VALUE_LINK_EXTERNAL_WITH_DISPLAY,
+	VALUE_LINK_FILE_URL_WITH_DISPLAY,
 	VALUE_LIST_LINKS,
 	VALUE_LIST_PLAIN,
 	VALUE_NUMBER,
@@ -3769,10 +3771,8 @@ describe('renderPropertyValue', () => {
 		app = createMockApp();
 	});
 
-	test('plain StringValue renders text via MarkdownRenderer (paragraph stripped)', async () => {
+	test('plain StringValue renders its text via Value.renderTo', async () => {
 		await renderPropertyValue(app, VALUE_PLAIN_STRING, el, 'note.md', {} as any);
-		// MarkdownRenderer mock wraps in <p>; renderCompactMarkdown should strip it
-		assert.ok(!el.querySelector('p'), 'paragraph wrapper should be stripped');
 		assert.ok(el.textContent?.includes('plain text'), 'text content should be present');
 	});
 
@@ -3798,6 +3798,23 @@ describe('renderPropertyValue', () => {
 		const link = el.querySelector('a.internal-link');
 		assert.ok(link, 'internal link element should be present');
 		assert.strictEqual(link?.getAttribute('data-href'), 'Project Alpha');
+	});
+
+	test('LinkValue from link(url, display) renders display text and href (issue #63)', async () => {
+		await renderPropertyValue(app, VALUE_LINK_EXTERNAL_WITH_DISPLAY, el, 'note.md', {} as any);
+		const link = el.querySelector('a');
+		assert.ok(link, 'anchor element should be present');
+		assert.strictEqual(link?.getAttribute('href'), 'https://google.com');
+		assert.strictEqual(link?.textContent, 'Open Google');
+		assert.ok(!link?.classList.contains('internal-link'), 'external URL should not be marked as internal-link');
+	});
+
+	test('LinkValue with file:// URL renders display text and clickable href (issue #63)', async () => {
+		await renderPropertyValue(app, VALUE_LINK_FILE_URL_WITH_DISPLAY, el, 'note.md', {} as any);
+		const link = el.querySelector('a');
+		assert.ok(link, 'anchor element should be present');
+		assert.strictEqual(link?.getAttribute('href'), 'file:///D:/path/to/file.txt');
+		assert.strictEqual(link?.textContent, 'Open file.txt');
 	});
 
 	test('NumberValue renders its string representation', async () => {
