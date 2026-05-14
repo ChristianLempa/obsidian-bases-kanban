@@ -1,15 +1,5 @@
-import type { App, BasesEntry, BasesPropertyId, Component, HoverPopover, QueryController, ViewOption } from 'obsidian';
-import {
-	BasesView,
-	Keymap,
-	ListValue,
-	NullValue,
-	Notice,
-	Value,
-	normalizePath,
-	parsePropertyId,
-	setIcon,
-} from 'obsidian';
+import type { BasesEntry, BasesPropertyId, HoverPopover, QueryController, ViewOption } from 'obsidian';
+import { BasesView, Keymap, NullValue, Notice, normalizePath, parsePropertyId, setIcon } from 'obsidian';
 import type { TFile } from 'obsidian';
 import Sortable from 'sortablejs';
 import {
@@ -68,44 +58,6 @@ export function isCardOrders(value: unknown): value is Record<string, Record<str
 
 export function isCollapsedLanes(value: unknown): value is Record<string, string[]> {
 	return isStringArrayRecord(value);
-}
-
-/**
- * Render an Obsidian Value into a container element.
- *
- * ListValue is walked manually so the comma separator and NullValue-skipping
- * rules are kanban-owned, and so each item dispatches recursively (a LinkValue
- * inside a list still routes through Value.renderTo).
- *
- * Every other Value subclass — StringValue, NumberValue, BooleanValue,
- * DateValue, RelativeDateValue, DurationValue, FileValue, HTMLValue,
- * IconValue, ImageValue, LinkValue, ObjectValue, RegExpValue, TagValue,
- * UrlValue — funnels through Value.renderTo. This is the same renderer the
- * native Bases Table view uses, so values translate neatly between views.
- *
- * Value / renderTo API: https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts (@since 1.10.0)
- */
-export async function renderPropertyValue(
-	app: App | undefined,
-	value: Value,
-	el: HTMLElement,
-	_sourcePath: string,
-	_component: Component,
-): Promise<void> {
-	if (value instanceof ListValue) {
-		const len = value.length();
-		for (let i = 0; i < len; i++) {
-			if (i > 0) el.appendChild(el.doc.createTextNode(', '));
-			const item = value.get(i);
-			if (!(item instanceof NullValue)) {
-				await renderPropertyValue(app, item, el, _sourcePath, _component);
-			}
-		}
-	} else if (app) {
-		value.renderTo(el, app.renderContext);
-	} else {
-		el.appendChild(el.doc.createTextNode(value.toString()));
-	}
 }
 
 export class KanbanView extends BasesView {
@@ -1182,12 +1134,12 @@ export class KanbanView extends BasesView {
 
 		const titleValue = entry.getValue(this.cardTitlePropertyId);
 
-		if (titleValue === null || titleValue instanceof NullValue) {
+		if (!titleValue || titleValue instanceof NullValue) {
 			titleEl.textContent = entry.file.basename;
 			return;
 		}
 
-		void renderPropertyValue(this.app, titleValue, titleEl, filePath, this);
+		titleValue.renderTo(titleEl, this.app.renderContext);
 	}
 
 	/**
@@ -1199,10 +1151,10 @@ export class KanbanView extends BasesView {
 	private renderCardCover(coverEl: HTMLElement, entry: BasesEntry, filePath: string): boolean {
 		if (!this.imagePropertyId) return false;
 		const value = entry.getValue(this.imagePropertyId);
-		if (value === null || value instanceof NullValue) return false;
+		if (!value || value instanceof NullValue) return false;
 
 		const raw = value.toString().trim();
-		if (!raw || raw === 'null') return false;
+		if (!raw) return false;
 
 		if (/^https?:\/\//i.test(raw)) {
 			coverEl.createEl('img', { attr: { src: raw, alt: '' } });
@@ -1253,9 +1205,8 @@ export class KanbanView extends BasesView {
 		for (const propertyId of order) {
 			if (propertyId === this.groupByPropertyId) continue;
 			const value = entry.getValue(propertyId);
-			if (value === null) continue;
-			const valueStr = value.toString().trim();
-			if (!valueStr || valueStr === 'null') continue;
+			if (!value || value instanceof NullValue) continue;
+			if (!value.toString().trim()) continue;
 			const label = this.config?.getDisplayName(propertyId) ?? propertyId;
 			const propertyEl = cardEl.createDiv({ cls: CSS_CLASSES.CARD_PROPERTY });
 			propertyEl.setAttribute('data-label', propertyId);
@@ -1269,7 +1220,7 @@ export class KanbanView extends BasesView {
 			const valueEl = propertyEl.createSpan({
 				cls: CSS_CLASSES.CARD_PROPERTY_VALUE,
 			});
-			void renderPropertyValue(this.app, value, valueEl, filePath, this);
+			value.renderTo(valueEl, this.app.renderContext);
 		}
 
 		// JS-managed hover: mouseenter/mouseleave instead of CSS :hover so the
