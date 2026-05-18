@@ -302,7 +302,7 @@ describe('Data Rendering - Column Rendering', () => {
 		assert.strictEqual(addBtn, null, 'Column should not have a quick add button without folder configured');
 	});
 
-	test('patchColumnCards adds add button when folder is configured after initial render', () => {
+	test('quick add button appears after full rebuild when folder is configured', () => {
 		const entries = createEntriesWithStatus();
 		controller = createMockQueryController(entries, TEST_PROPERTIES);
 		controller.app = app;
@@ -316,10 +316,8 @@ describe('Data Rendering - Column Rendering', () => {
 		let doingColumn = view.containerEl.querySelector('[data-column-value="Doing"]');
 		assert.strictEqual(doingColumn?.querySelector(`.${CSS_CLASSES.COLUMN_ADD_BTN}`), null);
 
-		// Configure folder and re-render
+		// Configure folder and re-render — folder change triggers a full rebuild
 		controller.config.set('quickAddFolder', 'cards');
-		triggerDataUpdate(view);
-		// Trigger a second update (same folder, no change) to exercise the patch path
 		triggerDataUpdate(view);
 
 		doingColumn = view.containerEl.querySelector('[data-column-value="Doing"]');
@@ -329,7 +327,7 @@ describe('Data Rendering - Column Rendering', () => {
 		);
 	});
 
-	test('patchColumnCards removes add button when folder is cleared', () => {
+	test('quick add button is removed after full rebuild when folder is cleared', () => {
 		const entries = createEntriesWithStatus();
 		controller = createMockQueryController(entries, TEST_PROPERTIES);
 		controller.app = app;
@@ -347,10 +345,8 @@ describe('Data Rendering - Column Rendering', () => {
 			'Add button should be present when folder is configured',
 		);
 
-		// Clear folder and re-render
+		// Clear folder and re-render — folder change triggers a full rebuild
 		controller.config.set('quickAddFolder', null);
-		triggerDataUpdate(view);
-		// Trigger a second update (same folder, no change) to exercise the patch path
 		triggerDataUpdate(view);
 
 		doingColumn = view.containerEl.querySelector('[data-column-value="Doing"]');
