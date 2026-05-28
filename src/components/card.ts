@@ -2,6 +2,7 @@ import type { App, BasesEntry, BasesPropertyId } from 'obsidian';
 import { Keymap, NullValue } from 'obsidian';
 import type { TFile } from 'obsidian';
 import { CSS_CLASSES, DATA_ATTRIBUTES } from '../constants.ts';
+import type { IconizeApi } from '../integrations/iconize.ts';
 
 export interface CardRenderCtx {
 	app: App;
@@ -14,6 +15,7 @@ export interface CardRenderCtx {
 	wrapValues: boolean;
 	order: BasesPropertyId[];
 	getDisplayName: (id: BasesPropertyId) => string;
+	iconizeApi: IconizeApi | null;
 }
 
 export interface CardCallbacks {
@@ -37,20 +39,33 @@ export function computeCardFingerprint(entry: BasesEntry, ctx: CardRenderCtx): s
 		const val = entry.getValue(ctx.imagePropertyId);
 		parts.push(val === null ? '' : val.toString());
 	}
+	if (ctx.iconizeApi) {
+		parts.push(ctx.iconizeApi.getIconNameByPath(entry.file.path) ?? '');
+	}
 	return parts.join('\x00');
 }
 
 export function renderCardTitle(titleEl: HTMLElement, entry: BasesEntry, ctx: CardRenderCtx): void {
+	titleEl.empty();
+
+	const iconName = ctx.iconizeApi?.getIconNameByPath(entry.file.path);
+	if (iconName) {
+		const iconEl = titleEl.createSpan({ cls: CSS_CLASSES.CARD_TITLE_ICON });
+		ctx.iconizeApi?.setIconForNode(iconName, iconEl);
+	}
+
+	const labelEl = titleEl.createSpan({ cls: CSS_CLASSES.CARD_TITLE_LABEL });
+
 	if (!ctx.cardTitlePropertyId) {
-		titleEl.textContent = entry.file.basename;
+		labelEl.textContent = entry.file.basename;
 		return;
 	}
 	const titleValue = entry.getValue(ctx.cardTitlePropertyId);
 	if (!titleValue || titleValue instanceof NullValue) {
-		titleEl.textContent = entry.file.basename;
+		labelEl.textContent = entry.file.basename;
 		return;
 	}
-	titleValue.renderTo(titleEl, ctx.app.renderContext);
+	titleValue.renderTo(labelEl, ctx.app.renderContext);
 }
 
 export function renderCardCover(

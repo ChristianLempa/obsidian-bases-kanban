@@ -83,6 +83,8 @@ export const CSS_CLASSES = {
 	// Card
 	CARD: 'obk-card',
 	CARD_TITLE: 'obk-card-title',
+	CARD_TITLE_ICON: 'obk-card-title-icon',
+	CARD_TITLE_LABEL: 'obk-card-title-label',
 	CARD_PREVIEW: 'obk-card-preview',
 	CARD_COVER: 'obk-card-cover',
 	CARD_COVER_FIT_COVER: 'obk-card-cover--fit-cover',

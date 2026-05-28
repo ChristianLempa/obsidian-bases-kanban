@@ -46,6 +46,7 @@ import {
 import type { DebouncedFn } from './utils/debounce.ts';
 import { debounce } from './utils/debounce.ts';
 import { ensureGroupExists, normalizePropertyValue } from './utils/grouping.ts';
+import { resolveIconizeApi } from './integrations/iconize.ts';
 
 export interface LegacyData {
 	columnOrders: Record<string, string[]>;
@@ -1023,6 +1024,7 @@ export class KanbanView extends BasesView {
 			wrapValues: this._lastWrapValue ?? false,
 			order: this.config?.getOrder() ?? [],
 			getDisplayName: (id) => this.config?.getDisplayName(id) ?? id,
+			iconizeApi: resolveIconizeApi(this.app),
 		};
 	}
 
