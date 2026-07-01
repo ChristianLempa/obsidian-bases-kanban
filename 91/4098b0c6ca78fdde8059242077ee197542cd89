@@ -1,0 +1,85 @@
+.gitignore
+  s_d4acc1fb42aa34::t_b610a88c6edab6 5
+  s_d4acc1fb42aa34::t_40ff1771fe62c6 6-11
+CHANGELOG.md
+  s_d4acc1fb42aa34::t_1c0de5b2405342 1-13
+src/components/card.ts
+  s_3922a204ae8ecc::t_df5e54c4568dd3 35-38,93-96,140-174,180,183-184
+  s_3922a204ae8ecc::t_96dd89a57be21e 91-92,97-98,108
+  s_3922a204ae8ecc::t_6d3ac3a6a71d55 79-87,258
+  s_3922a204ae8ecc::t_2480a78b2483e2 67-75
+  s_3922a204ae8ecc::t_4f07182d25c76b 25-34,39-66,76-78,88-90,99-107,109-139,175-179,181-182,185-186,201,225-226,228-229,232-233
+styles.css
+  s_3922a204ae8ecc::t_4cf4e30e0bd2c3 508
+  s_3922a204ae8ecc::t_c71422064a6047 501-506,509-510
+  s_3922a204ae8ecc::t_10994ecc35e364 507
+.github/workflows/ci.yml
+  s_d4acc1fb42aa34::t_83320eba73d542 10,14-18,20-22,26-27
+src/components/column.ts
+  s_3922a204ae8ecc::t_8a7480d8f6bdcf 93
+scripts/check-version.mjs
+  s_d4acc1fb42aa34::t_b5065274789dac 1-27
+tests/mocks/obsidian.ts
+  s_3922a204ae8ecc::t_7c81c3fb4c8aa0 58-60,66-67,75-76
+src/constants.ts
+  s_d4acc1fb42aa34::t_2d04da2869aef8 9
+  s_3922a204ae8ecc::t_f48e0e29b5d330 88
+tests/kanbanView.test.ts
+  s_3922a204ae8ecc::t_4a2f5f2c3b274c 1084-1088
+  s_3922a204ae8ecc::t_8776cb6d31a219 1091-1097,1101-1127
+  s_3922a204ae8ecc::t_dc283a4d3624a9 1098-1100
+  s_3922a204ae8ecc::t_6a19a0ea03576b 1054,1135-1149
+  s_3922a204ae8ecc::t_5ffa8c0944e534 3,1028-1053
+  s_3922a204ae8ecc::t_579fd643950f95 1056-1083,1089-1090
+  s_3922a204ae8ecc::t_685d0705de3b30 1055
+tests/helpers.ts
+  s_3922a204ae8ecc::t_230dcf3bd88603 265
+src/main.ts
+  s_d4acc1fb42aa34::t_c45e4a6a914b9a 5,59
+  s_3922a204ae8ecc::t_0c7bb92d0a6115 58,60
+.github/workflows/release.yml
+  s_d4acc1fb42aa34::t_719c36aa359ab6 1-52
+src/kanbanView.ts
+  s_d4acc1fb42aa34::t_91f5c89457b56a 91
+  s_3922a204ae8ecc::t_afb5a1cd034a1b 1434
+  s_3922a204ae8ecc::t_18569baab4b5a1 1,107,204-205,212-225,560,1433,1435-1436
+README.md
+  s_d4acc1fb42aa34::t_1c07c56820460c 1,3-11,49-50,175-177,179,181-184,186-190,192,194
+tests/main.test.ts
+  s_3922a204ae8ecc::t_56ee32c14aac26 13,35
+  s_d4acc1fb42aa34::t_ad586743e5639e 57
+scripts/extract-release-notes.mjs
+  s_d4acc1fb42aa34::t_5490e72e73cd38 1-29
+manifest.json
+  s_d4acc1fb42aa34::t_d1d02a4d94c004 2-4,6-8
+package-lock.json
+  s_d4acc1fb42aa34::t_520965d7ccf11d 2-3,8-9
+package.json
+  s_d4acc1fb42aa34::t_b7fca6cc9df916 2-4,19-22,31
+versions.json
+  s_d4acc1fb42aa34::t_143e4c04f2d17c 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "914098b0c6ca78fdde8059242077ee197542cd89",
+  "prompts": {},
+  "sessions": {
+    "s_3922a204ae8ecc": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f1734-a93e-7e7b-9e4f-3d9fd1933768",
+        "model": "gpt-5.5"
+      },
+      "human_author": "xcad <christian.lempa@clcreative.de>"
+    },
+    "s_d4acc1fb42aa34": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f1c9d-1ac2-7518-b7b7-80dec19f48d1",
+        "model": "gpt-5.5"
+      },
+      "human_author": "xcad <christian.lempa@clcreative.de>"
+    }
+  }
+}
